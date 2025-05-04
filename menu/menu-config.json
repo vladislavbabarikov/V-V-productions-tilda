@@ -1,0 +1,68 @@
+{
+  "menuConfig": [
+    {
+      "label": "Главная",
+      "icon": "https://cdn-icons-png.flaticon.com/512/25/25694.png",
+      "href": "#",
+      "position": "top",
+      "rowId": 1,
+      "showIn": ["Default"]
+    },
+    {
+      "label": "Поиск",
+      "icon": "https://cdn-icons-png.flaticon.com/512/622/622669.png",
+      "href": "#",
+      "position": "top",
+      "rowId": 2,
+      "showIn": ["Default"]
+    },
+    {
+      "label": "Проекты",
+      "icon": "https://cdn-icons-png.flaticon.com/512/2721/2721065.png",
+      "href": "#",
+      "position": "top",
+      "rowId": 3,
+      "showIn": ["V//V Productions", "Projects"],
+      "submenu": [
+        {
+          "label": "Project A",
+          "icon": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+          "href": "#"
+        },
+        {
+          "label": "Project B",
+          "icon": "https://cdn-icons-png.flaticon.com/512/3135/3135789.png",
+          "href": "#"
+        }
+      ]
+    },
+    {
+      "label": "Связаться с автором",
+      "icon": "https://cdn-icons-png.flaticon.com/512/561/561127.png",
+      "href": "#",
+      "position": "top",
+      "rowId": 4,
+      "showIn": ["Professional Page"]
+    },
+    {
+      "label": "Аккаунт",
+      "icon": "https://cdn-icons-png.flaticon.com/512/1077/1077063.png",
+      "href": "#",
+      "position": "bottom",
+      "rowId": 1,
+      "showIn": ["Default"]
+    },
+    {
+      "label": "Блог",
+      "icon": "https://cdn-icons-png.flaticon.com/512/1828/1828940.png",
+      "href": "#",
+      "position": "bottom",
+      "rowId": 2,
+      "showIn": ["Default"]
+    }
+  ],
+  
+    "modules": {
+    "socialButtons": true
+  }
+}
