@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     labelElement.textContent = activeLabel;
 
-    fetch('https://raw.githubusercontent.com/vladislavbabarikov/V-V-productions-tilda/refs/heads/main/menu/menu-config.json')
+    fetch('https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@refs/heads/main/menu/menu-config.json')
       .then(res => res.json())
       .then(config => {
         const menuConfig = config.menuConfig || [];
