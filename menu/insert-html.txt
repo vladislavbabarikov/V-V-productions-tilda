@@ -1,0 +1,15 @@
+<!-- 
+  Name: insert-html.txt
+  Author: Vladislav Babarikov
+  Version: 1.01
+  Description: Код для вставки внутрь блока T123 V//V Productions
+  License: Все права защищены © Vladislav Babarikov
+  by V//V Productions
+-->
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- CSS, JS, HTML it will be inserted automatically inside menu.js -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/menu/menu.css">
+<script src="https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/menu/menu.js"></script>
