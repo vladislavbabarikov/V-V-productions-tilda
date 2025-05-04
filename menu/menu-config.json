@@ -36,14 +36,14 @@
         }
       ]
     },
-    {
+ /*   {
       "label": "Связаться с автором",
       "icon": "https://cdn-icons-png.flaticon.com/512/561/561127.png",
       "href": "#",
       "position": "top",
       "rowId": 4,
       "showIn": ["Professional Page"]
-    },
+    }, */
     {
       "label": "Аккаунт",
       "icon": "https://cdn-icons-png.flaticon.com/512/1077/1077063.png",
