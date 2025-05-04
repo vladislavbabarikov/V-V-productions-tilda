@@ -1,0 +1,144 @@
+/* 
+  Name: menu.css
+  Author: Vladislav Babarikov
+  Version: 1.01
+  Description: Стили для бокового навигационного меню V//V Productions
+  License: Все права защищены © Vladislav Babarikov
+  by V//V Productions
+*/
+.sidebar-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 60px;
+  background-color: #fff;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  display: none;
+  font-family: 'Montserrat', sans-serif;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  justify-content: space-between;
+}
+
+@media (min-width: 768px) {
+  .sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+  }
+}
+
+.sidebar-menu:hover { width: 240px; }
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  width: 100%;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar-logo img {
+  width: 30px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-label {
+  font-size: 14px;
+  color: #888;
+  margin-left: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.sidebar-menu:hover .sidebar-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sidebar-menu a {
+  text-decoration: none;
+  color: black;
+}
+
+.menu-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item, .submenu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-sizing: border-box;
+  color: inherit;
+}
+
+.menu-item:hover, .submenu-item:hover {
+  background-color: #f4f4f4;
+}
+
+.menu-item img, .submenu-item img {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.menu-text {
+  margin-left: 12px;
+  white-space: nowrap;
+  word-break: break-word;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.sidebar-menu:hover .menu-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  border-left: 2px solid #eee;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+.submenu.open {
+  max-height: 500px;
+  opacity: 1;
+  pointer-events: all;
+}
+
+.toggle-arrow {
+  margin-left: auto;
+  transition: transform 0.2s;
+}
+
+.toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+.menu-bottom {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  margin-top: auto;
+}
