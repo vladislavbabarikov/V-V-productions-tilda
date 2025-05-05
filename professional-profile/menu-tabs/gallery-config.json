@@ -2,7 +2,7 @@
   {
     "key": "illustrations",
     "title": "Иллюстрации",
-    "container": "HL",                          // горизонтальные большие (3 × 6 / 3 × 3 / 3 × 2)
+    "container": "HL",
     "images": [
       "https://static.tildacdn.com/tild3632-6563-4536-a338-363963623732/photo.png"
     ]
@@ -10,7 +10,7 @@
   {
     "key": "splashart",
     "title": "Splash‑Art",
-    "container": "HS",                          // горизонтальные маленькие (2 × 3 / 2 × 3 / 2 × 2)
+    "container": "HS",
     "images": [
       "https://static.tildacdn.com/tild3535-3363-4637-b639-636537376336/Sparrow.png",
       "https://static.tildacdn.com/tild3039-3333-4933-a531-313530643366/eva.png"
@@ -19,7 +19,7 @@
   {
     "key": "characters",
     "title": "Персонажи",
-    "container": "VS",                          // вертикальные маленькие (3 × 2 в любых колонках)
+    "container": "VS",
     "images": [
       "https://static.tildacdn.com/tild3063-6630-4239-b965-653231333565/Angel.jpg",
       "https://static.tildacdn.com/tild3562-3861-4666-b161-343764316466/Obsession.jpg",
@@ -30,7 +30,7 @@
   {
     "key": "assets",
     "title": "Assets",
-    "container": "SMART",                       // «умная» раскладка (старый decideClass)
+    "container": "SMART",
     "images": [
       "https://static.tildacdn.com/tild3963-3166-4232-b464-346263666630/Gt.png",
       "https://static.tildacdn.com/tild3332-3866-4130-b938-306562366534/Barbarian_Guild.png",
@@ -45,7 +45,7 @@
   {
     "key": "allworks",
     "title": "Все работы",
-    "container": "SMART",                       // «умная» раскладка
+    "container": "SMART",
     "images": [
       "https://static.tildacdn.com/tild6637-6630-4132-b562-663966616364/taverna.png",
       "https://static.tildacdn.com/tild6163-6535-4562-b964-346534333933/trading_post.png",
