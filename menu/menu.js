@@ -1,7 +1,7 @@
 /* 
   Name: menu.js
   Author: Vladislav Babarikov
-  Version: 1.2.1
+  Version: 1.2.4
   Description: Логика динамического меню V//V Productions
   License: Все права защищены © Vladislav Babarikov
 */
@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* ==========  SIDEBAR  (desktop)  ==================================== */
 function initializeSidebar(config) {
   const labelEl = document.getElementById('sidebar-label');
   const topMenu = document.getElementById('menu-top');
@@ -35,7 +34,6 @@ function initializeSidebar(config) {
   const sidebar = document.getElementById('sidebar');
   const submenuState = { open: false };
 
-  /* активный заголовок */
   let activeLabel = 'V//V Production';
   for (const cls in sectionLabels) {
     if (document.querySelector(`.${cls}`)) activeLabel = sectionLabels[cls];
@@ -53,11 +51,11 @@ function initializeSidebar(config) {
       )
       .sort((a, b) => a.rowId - b.rowId);
 
-  [...list('top'), ...list('bottom')].forEach(item =>
-    (item.position === 'top' ? topMenu : bottomMenu).append(...menuNodes(item))
-  );
+  [...list('top'), ...list('bottom')].forEach(item => {
+    const container = (item.position === 'top' ? topMenu : bottomMenu);
+    menuNodes(item).forEach(node => container.appendChild(node));
+  });
 
-  /* соц‑кнопки */
   if (modules.socialButtons) {
     const s = document.createElement('script');
     s.src =
@@ -67,15 +65,14 @@ function initializeSidebar(config) {
     document.body.appendChild(s);
   }
 
-  /* авто‑закрытие сабменю по hover‑out */
   sidebar.addEventListener('mouseleave', () => {
-    if (submenuState.open) toggle(false);
+    if (submenuState.open) toggleSide(false);
   });
   sidebar.addEventListener('mouseenter', () => {
-    if (submenuState.open) toggle(true);
+    if (submenuState.open) toggleSide(true);
   });
 
-  function toggle(open) {
+  function toggleSide(open) {
     sidebar.querySelector('.submenu')?.classList.toggle('open', open);
     sidebar.querySelector('.toggle-arrow')?.classList.toggle('open', open);
   }
@@ -109,7 +106,6 @@ function initializeSidebar(config) {
       });
       return [wrap, sub];
     }
-    /* обычный пункт */
     const a = document.createElement('a');
     a.href = item.href;
     a.className = 'menu-item';
@@ -119,7 +115,6 @@ function initializeSidebar(config) {
   }
 }
 
-/* ==========  MOBILE NAV  =========================================== */
 function initializeMobile(cfg) {
   const mobileNav = document.getElementById('mobile-nav');
   const mainRow = document.getElementById('mobile-main-row');
@@ -127,30 +122,44 @@ function initializeMobile(cfg) {
   if (!mobileNav || !mainRow || !drawer) return;
 
   const { menuConfig = [], mobileButtonsKey = [], visibleText = true } = cfg;
-
-  /* словарь по key */
   const dict = Object.fromEntries(menuConfig.map(i => [i.key, i]));
 
-  /* 1) главные 5 кнопок */
-  mobileButtonsKey.slice(0, 5).forEach(k => {
-    const item = dict[k];
+  // 1) Собираем главную строку
+  mobileButtonsKey.slice(0, 5).forEach(key => {
+    const item = dict[key];
     if (!item) return;
     const btn = makeBtn(item, !visibleText);
     mainRow.appendChild(btn);
 
-    /* кнопка‑раскрывалка => toggle панели */
+    // если кнопка-раскрывалка
     if (item.href === '#menu-toggle') {
       btn.addEventListener('click', e => {
         e.preventDefault();
         mobileNav.classList.toggle('expanded');
+        adjustDrawerHeight();
+      });
+    }
+
+    // мобильное сабменю вправо
+    if (item.submenu) {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        openSubmenu(item);
       });
     }
   });
 
-  /* 2) остальные кнопки (без дублирования) */
-  menuConfig.forEach(i => {
-    if (mobileButtonsKey.includes(i.key)) return; // уже в верхней пятёрке
-    drawer.appendChild(makeBtn(i, false));
+  // 2) Остальные — в drawer
+  menuConfig.forEach(item => {
+    if (mobileButtonsKey.includes(item.key)) return;
+    drawer.appendChild(makeBtn(item, false));
+  });
+
+  // 3) Закрытие по клику вне
+  window.addEventListener('click', e => {
+    if (mobileNav.classList.contains('expanded') && !mobileNav.contains(e.target)) {
+      mobileNav.classList.remove('expanded');
+    }
   });
 
   function makeBtn(item, hideLabel) {
@@ -160,5 +169,49 @@ function initializeMobile(cfg) {
     a.innerHTML = `<img src="${item.icon}" alt="${item.label}">
                    <span>${item.label}</span>`;
     return a;
+  }
+
+  function adjustDrawerHeight() {
+    const count = drawer.children.length;
+    const rows = Math.ceil(count / 5);
+    const rowH = 70; // высота одной строки
+    drawer.style.maxHeight = rows * rowH + 'px';
+  }
+
+  function openSubmenu(item) {
+    // сдвигаем mainRow влево
+    mainRow.style.transform = 'translateX(-100%)';
+    mainRow.style.transition = 'transform 0.3s ease';
+
+    // собираем временный массив кнопок сабменю
+    const subBtns = item.submenu.map(s => {
+      const btn = makeBtn(s, false);
+      btn.classList.add('submenu-mobile');
+      return btn;
+    });
+
+    // очищаем drawer и вставляем сабменю
+    drawer.innerHTML = '';
+    subBtns.forEach(b => drawer.appendChild(b));
+
+    // показываем drawer
+    mobileNav.classList.add('expanded');
+    adjustDrawerHeight();
+
+    // кнопка «назад»
+    const back = document.createElement('button');
+    back.textContent = '← Назад';
+    back.className = 'back-btn';
+    back.addEventListener('click', () => {
+      mainRow.style.transform = '';
+      drawer.innerHTML = '';
+      menuConfig.forEach(i => {
+        if (!mobileButtonsKey.includes(i.key)) {
+          drawer.appendChild(makeBtn(i, false));
+        }
+      });
+      mobileNav.classList.remove('expanded');
+    });
+    drawer.insertBefore(back, drawer.firstChild);
   }
 }
