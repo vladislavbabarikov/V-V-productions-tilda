@@ -1,7 +1,7 @@
 /*
   Name: menu.css
   Author: Vladislav Babarikov
-  Version: 1.2.2
+  Version: 1.2.3
   Description: Стили бокового и нижнего меню V//V Productions
   License: Все права защищены © Vladislav Babarikov
   by V//V Productions
@@ -157,8 +157,7 @@
   border-top-right-radius: 14px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
-  justify-content: space-around;
-  align-items: center;
+  flex-direction: column;
   z-index: 1000;
   font-family: 'Montserrat', sans-serif;
   padding: 0;
@@ -167,30 +166,40 @@
   transition: height 0.3s ease;
 }
 
-.mobile-bottom-nav .nav-btn {
+/* Верхняя строка с кнопками */
+.nav-main {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 70px;
+  width: 100%;
+  background: #fff;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+/* Стили кнопок */
+.nav-btn {
   flex: 1;
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
   text-decoration: none;
   color: #000;
   font-size: 11px;
-  line-height: 1.2;
   padding: 4px 0;
-  overflow: visible;
   white-space: nowrap;
+  height: 100%;
 }
 
-.mobile-bottom-nav .nav-btn img {
+.nav-btn img {
   width: 24px;
   height: 24px;
   margin-bottom: 2px;
 }
 
-.mobile-bottom-nav .nav-btn.hide-label span {
+.nav-btn.hide-label span {
   display: none;
 }
 
@@ -226,15 +235,6 @@
   .mobile-bottom-nav.expanded .nav-drawer {
     height: calc(100vh - 90px);
   }
-}
-
-/* sticky строка сверху */
-.nav-main {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  border-top-left-radius: 14px;
-  border-top-right-radius: 14px;
 }
 
 /* ─────────────── MEDIA QUERIES ─────────────── */
