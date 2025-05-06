@@ -18,16 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(r => r.text())
     .then(html => {
       document.body.insertAdjacentHTML('beforeend', html);
-      fetch(CONFIG_URL)
-        .then(r => r.json())
-        .then(cfg => {
-          initializeSidebar(cfg);
-          initializeMobileNav(cfg);
-        });
+      return fetch(CONFIG_URL);
+    })
+    .then(r => r.json())
+    .then(cfg => {
+      initializeSidebar(cfg);
+      initializeMobile(cfg);
     });
 });
 
-/* ─────────── SIDEBAR (десктоп) ─────────── */
+/* ==========  SIDEBAR  (desktop)  ==================================== */
 function initializeSidebar(config) {
   const labelEl = document.getElementById('sidebar-label');
   const topMenu = document.getElementById('menu-top');
@@ -35,67 +35,52 @@ function initializeSidebar(config) {
   const sidebar = document.getElementById('sidebar');
   const submenuState = { open: false };
 
+  /* активный заголовок */
   let activeLabel = 'V//V Production';
   for (const cls in sectionLabels) {
-    if (document.querySelector(`.${cls}`)) {
-      activeLabel = sectionLabels[cls];
-      break;
-    }
+    if (document.querySelector(`.${cls}`)) activeLabel = sectionLabels[cls];
   }
   labelEl.textContent = activeLabel;
 
-  const menuConfig = config.menuConfig || [];
-  const modules = config.modules || {};
+  const { menuConfig = [], modules = {} } = config;
 
-  const topItems = menuConfig
-    .filter(
-      i =>
-        i.position === 'top' &&
-        (i.showIn.includes('Default') || i.showIn.includes(activeLabel))
-    )
-    .sort((a, b) => a.rowId - b.rowId);
+  const list = key =>
+    menuConfig
+      .filter(
+        i =>
+          i.position === key &&
+          (i.showIn.includes('Default') || i.showIn.includes(activeLabel))
+      )
+      .sort((a, b) => a.rowId - b.rowId);
 
-  const bottomItems = menuConfig
-    .filter(
-      i =>
-        i.position === 'bottom' &&
-        (i.showIn.includes('Default') || i.showIn.includes(activeLabel))
-    )
-    .sort((a, b) => a.rowId - b.rowId);
+  [...list('top'), ...list('bottom')].forEach(item =>
+    (item.position === 'top' ? topMenu : bottomMenu).append(...menuNodes(item))
+  );
 
-  [...topItems, ...bottomItems].forEach(item => {
-    const target = item.position === 'top' ? topMenu : bottomMenu;
-    createMenuItem(item).forEach(el => target.appendChild(el));
-  });
-
+  /* соц‑кнопки */
   if (modules.socialButtons) {
     const s = document.createElement('script');
     s.src =
       'https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/menu/modules/social-buttons.js';
-    s.onload = () => {
-      if (typeof applySocialButtons === 'function') {
-        applySocialButtons('#menu-top');
-      }
-    };
+    s.onload = () =>
+      typeof applySocialButtons === 'function' && applySocialButtons('#menu-top');
     document.body.appendChild(s);
   }
 
+  /* авто‑закрытие сабменю по hover‑out */
   sidebar.addEventListener('mouseleave', () => {
-    if (submenuState.open) toggleSubmenu(false);
+    if (submenuState.open) toggle(false);
   });
-
   sidebar.addEventListener('mouseenter', () => {
-    if (submenuState.open) toggleSubmenu(true);
+    if (submenuState.open) toggle(true);
   });
 
-  function toggleSubmenu(open) {
-    const submenu = sidebar.querySelector('.submenu');
-    const arrow = sidebar.querySelector('.toggle-arrow');
-    submenu?.classList.toggle('open', open);
-    arrow?.classList.toggle('open', open);
+  function toggle(open) {
+    sidebar.querySelector('.submenu')?.classList.toggle('open', open);
+    sidebar.querySelector('.toggle-arrow')?.classList.toggle('open', open);
   }
 
-  function createMenuItem(item) {
+  function menuNodes(item) {
     if (item.submenu) {
       const wrap = document.createElement('div');
       wrap.className = 'menu-item project-toggle';
@@ -124,34 +109,56 @@ function initializeSidebar(config) {
       });
       return [wrap, sub];
     }
-
-    const link = document.createElement('a');
-    link.href = item.href;
-    link.className = 'menu-item';
-    link.innerHTML = `
-      <img src="${item.icon}" alt="${item.label}">
-      <span class="menu-text">${item.label}</span>`;
-    return [link];
+    /* обычный пункт */
+    const a = document.createElement('a');
+    a.href = item.href;
+    a.className = 'menu-item';
+    a.innerHTML = `<img src="${item.icon}" alt="${item.label}">
+                   <span class="menu-text">${item.label}</span>`;
+    return [a];
   }
 }
 
-/* ─────────── MOBILE NAV (нижняя панель) ─────────── */
-function initializeMobileNav(config) {
+/* ==========  MOBILE NAV  =========================================== */
+function initializeMobile(cfg) {
   const mobileNav = document.getElementById('mobile-nav');
-  if (!mobileNav) return;
+  const mainRow = document.getElementById('mobile-main-row');
+  const drawer = document.getElementById('mobile-drawer');
+  if (!mobileNav || !mainRow || !drawer) return;
 
-  const items = (config.menuConfig || [])
-    .filter(i => i.showIn.includes('Default'))
-    .sort((a, b) => (a.mobileRowId ?? a.rowId) - (b.mobileRowId ?? b.rowId))
-    .slice(0, 5); // до 5 элементов
+  const { menuConfig = [], mobileButtonsKey = [], visibleText = true } = cfg;
 
-  items.forEach(item => {
-    const btn = document.createElement('a');
-    btn.href = item.href;
-    btn.className = 'nav-btn';
-    btn.innerHTML = `
-      <img src="${item.icon}" alt="${item.label}">
-      <span>${item.label}</span>`;
-    mobileNav.appendChild(btn);
+  /* словарь по key */
+  const dict = Object.fromEntries(menuConfig.map(i => [i.key, i]));
+
+  /* 1) главные 5 кнопок */
+  mobileButtonsKey.slice(0, 5).forEach(k => {
+    const item = dict[k];
+    if (!item) return;
+    const btn = makeBtn(item, !visibleText);
+    mainRow.appendChild(btn);
+
+    /* кнопка‑раскрывалка => toggle панели */
+    if (item.href === '#menu-toggle') {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        mobileNav.classList.toggle('expanded');
+      });
+    }
   });
+
+  /* 2) остальные кнопки (без дублирования) */
+  menuConfig.forEach(i => {
+    if (mobileButtonsKey.includes(i.key)) return; // уже в верхней пятёрке
+    drawer.appendChild(makeBtn(i, false));
+  });
+
+  function makeBtn(item, hideLabel) {
+    const a = document.createElement('a');
+    a.href = item.href;
+    a.className = 'nav-btn' + (hideLabel ? ' hide-label' : '');
+    a.innerHTML = `<img src="${item.icon}" alt="${item.label}">
+                   <span>${item.label}</span>`;
+    return a;
+  }
 }
