@@ -225,6 +225,12 @@
   padding: 10px;
 }
 
+.nav-btn.placeholder {
+  visibility: hidden;
+  flex: 1 0 20%;
+}
+
+
 /* ─────────────── MEDIA QUERIES ─────────────── */
 
 @media (max-width: 767px) {
