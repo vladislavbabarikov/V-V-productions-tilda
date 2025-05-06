@@ -7,9 +7,9 @@
 */
 
 const CONFIG_URL =
-  'https://raw.githubusercontent.com/vladislavbabarikov/V-V-productions-tilda/refs/heads/main/menu/menu-config.json';
+  'https://vladislavbabarikov.github.io/V-V-productions-tilda/menu/menu-config.json';
 const MENU_HTML_URL =
-  'https://raw.githubusercontent.com/vladislavbabarikov/V-V-productions-tilda/refs/heads/main/menu/menu.html';
+  'https://vladislavbabarikov.github.io/V-V-productions-tilda/menu/menu.html';
 
 const sectionLabels = { t337: 'Professional Page' };
 
