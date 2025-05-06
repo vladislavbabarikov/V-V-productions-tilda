@@ -11,9 +11,9 @@
 */
 
 const CONFIG_URL =
-  'https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@refs/heads/main/menu/menu-config.json';
+  'https://raw.githubusercontent.com/vladislavbabarikov/V-V-productions-tilda/refs/heads/main/menu/menu-config.json';
 const MENU_HTML_URL =
-  'https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/menu/menu.html';
+  'https://raw.githubusercontent.com/vladislavbabarikov/V-V-productions-tilda/refs/heads/main/menu/menu.html';
 
 const companyLogo =
   'https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png';
