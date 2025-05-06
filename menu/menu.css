@@ -1,4 +1,4 @@
-/* 
+/*
   Name: menu.css
   Author: Vladislav Babarikov
   Version: 1.2.4
@@ -155,7 +155,7 @@
   border-top-left-radius: 14px;
   border-top-right-radius: 14px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-  display: flex;
+  display: flex;               /* теперь flex, а не block */
   flex-direction: column;
   z-index: 1000;
   font-family: 'Montserrat', sans-serif;
@@ -230,7 +230,7 @@
 
 @media (max-width: 767px) {
   .mobile-bottom-nav {
-    display: block;
+    display: flex;  /* изменено: flex вместо block */
   }
   .sidebar-menu {
     display: none;
