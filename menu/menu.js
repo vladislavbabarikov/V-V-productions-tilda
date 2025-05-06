@@ -1,9 +1,8 @@
 /* 
   Name: menu.js
   Author: Vladislav Babarikov
-  Version: 1.2.4
+  Version: 1.2.5
   Description: Логика динамического меню V//V Productions
-  License: Все права защищены © Vladislav Babarikov
 */
 
 const CONFIG_URL =
@@ -52,7 +51,7 @@ function initializeSidebar(config) {
       .sort((a, b) => a.rowId - b.rowId);
 
   [...list('top'), ...list('bottom')].forEach(item => {
-    const container = (item.position === 'top' ? topMenu : bottomMenu);
+    const container = item.position === 'top' ? topMenu : bottomMenu;
     menuNodes(item).forEach(node => container.appendChild(node));
   });
 
@@ -93,8 +92,7 @@ function initializeSidebar(config) {
         sub.insertAdjacentHTML(
           'beforeend',
           `<a href="${s.href}" class="submenu-item">
-             <img src="${s.icon}" alt="${s.label}">
-             <span class="menu-text">${s.label}</span>
+             <img src="${s.icon}" alt="${s.label}"><span class="menu-text">${s.label}</span>
            </a>`
         )
       );
@@ -109,34 +107,36 @@ function initializeSidebar(config) {
     const a = document.createElement('a');
     a.href = item.href;
     a.className = 'menu-item';
-    a.innerHTML = `<img src="${item.icon}" alt="${item.label}">
-                   <span class="menu-text">${item.label}</span>`;
+    a.innerHTML = `<img src="${item.icon}" alt="${item.label}"><span class="menu-text">${item.label}</span>`;
     return [a];
   }
 }
 
 function initializeMobile(cfg) {
   const mobileNav = document.getElementById('mobile-nav');
-  const mainRow = document.getElementById('mobile-main-row');
-  const drawer = document.getElementById('mobile-drawer');
+  const mainRow   = document.getElementById('mobile-main-row');
+  const drawer    = document.getElementById('mobile-drawer');
   if (!mobileNav || !mainRow || !drawer) return;
 
   const { menuConfig = [], mobileButtonsKey = [], visibleText = true } = cfg;
   const dict = Object.fromEntries(menuConfig.map(i => [i.key, i]));
 
-  // 1) Собираем главную строку
-  mobileButtonsKey.slice(0, 5).forEach(key => {
+  // сбор главного ряда
+  mobileButtonsKey.slice(0,5).forEach(key => {
     const item = dict[key];
     if (!item) return;
     const btn = makeBtn(item, !visibleText);
     mainRow.appendChild(btn);
 
-    // если кнопка-раскрывалка
+    // кнопка-расскрывалка
     if (item.href === '#menu-toggle') {
       btn.addEventListener('click', e => {
         e.preventDefault();
-        mobileNav.classList.toggle('expanded');
-        adjustDrawerHeight();
+        if (mobileNav.classList.toggle('expanded')) {
+          adjustDrawerHeight();
+        } else {
+          collapseMenu();
+        }
       });
     }
 
@@ -149,69 +149,53 @@ function initializeMobile(cfg) {
     }
   });
 
-  // 2) Остальные — в drawer
+  // остальные в drawer
   menuConfig.forEach(item => {
     if (mobileButtonsKey.includes(item.key)) return;
     drawer.appendChild(makeBtn(item, false));
   });
 
-  // 3) Закрытие по клику вне
+  // клик вне — закрыть
   window.addEventListener('click', e => {
     if (mobileNav.classList.contains('expanded') && !mobileNav.contains(e.target)) {
-      mobileNav.classList.remove('expanded');
+      collapseMenu();
     }
   });
 
-  function makeBtn(item, hideLabel) {
+  function makeBtn(item, hide) {
     const a = document.createElement('a');
     a.href = item.href;
-    a.className = 'nav-btn' + (hideLabel ? ' hide-label' : '');
-    a.innerHTML = `<img src="${item.icon}" alt="${item.label}">
-                   <span>${item.label}</span>`;
+    a.className = 'nav-btn' + (hide ? ' hide-label' : '');
+    a.innerHTML = `<img src="${item.icon}" alt="${item.label}"><span>${item.label}</span>`;
     return a;
   }
-
   function adjustDrawerHeight() {
-    const count = drawer.children.length;
-    const rows = Math.ceil(count / 5);
-    const rowH = 70; // высота одной строки
-    drawer.style.maxHeight = rows * rowH + 'px';
+    const cnt = drawer.children.length;
+    const rows = Math.ceil(cnt/5);
+    drawer.style.maxHeight = `${rows*70}px`;
   }
-
+  function collapseMenu() {
+    mobileNav.classList.remove('expanded');
+    mainRow.style.transform = '';
+    drawer.style.maxHeight = '0';
+  }
   function openSubmenu(item) {
-    // сдвигаем mainRow влево
     mainRow.style.transform = 'translateX(-100%)';
     mainRow.style.transition = 'transform 0.3s ease';
-
-    // собираем временный массив кнопок сабменю
-    const subBtns = item.submenu.map(s => {
-      const btn = makeBtn(s, false);
-      btn.classList.add('submenu-mobile');
-      return btn;
-    });
-
-    // очищаем drawer и вставляем сабменю
     drawer.innerHTML = '';
-    subBtns.forEach(b => drawer.appendChild(b));
-
-    // показываем drawer
-    mobileNav.classList.add('expanded');
-    adjustDrawerHeight();
-
-    // кнопка «назад»
+    item.submenu.forEach(s => drawer.appendChild(makeBtn(s,false)));
     const back = document.createElement('button');
-    back.textContent = '← Назад';
-    back.className = 'back-btn';
-    back.addEventListener('click', () => {
+    back.textContent = '← Назад'; back.className = 'back-btn';
+    back.onclick = () => {
       mainRow.style.transform = '';
       drawer.innerHTML = '';
       menuConfig.forEach(i => {
-        if (!mobileButtonsKey.includes(i.key)) {
-          drawer.appendChild(makeBtn(i, false));
-        }
+        if (!mobileButtonsKey.includes(i.key)) drawer.appendChild(makeBtn(i,false));
       });
-      mobileNav.classList.remove('expanded');
-    });
+      collapseMenu();
+    };
     drawer.insertBefore(back, drawer.firstChild);
+    mobileNav.classList.add('expanded');
+    adjustDrawerHeight();
   }
 }
