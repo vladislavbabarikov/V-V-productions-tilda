@@ -1,24 +1,55 @@
 {
+  "mobileButtonsKey": ["home", "blog","more", "account", "search"], 
+  "visibleText": false,
+
   "menuConfig": [
     {
+      "key": "home",
       "label": "Главная",
       "icon": "https://cdn-icons-png.flaticon.com/512/25/25694.png",
       "href": "#",
       "position": "top",
       "rowId": 1,
-      "mobileRowId":1,
       "showIn": ["Default"]
     },
     {
+      "key": "blog",
+      "label": "Блог",
+      "icon": "https://cdn-icons-png.flaticon.com/512/1828/1828940.png",
+      "href": "#",
+      "position": "bottom",
+      "rowId": 2,
+      "showIn": ["Default"]
+    },
+    {
+      "key": "account",
+      "label": "Аккаунт",
+      "icon": "https://cdn-icons-png.flaticon.com/512/1077/1077063.png",
+      "href": "#",
+      "position": "bottom",
+      "rowId": 1,
+      "showIn": ["Default"]
+    },
+    {
+      "key": "search",
       "label": "Поиск",
       "icon": "https://cdn-icons-png.flaticon.com/512/622/622669.png",
       "href": "#",
       "position": "top",
       "rowId": 2,
-      "mobileRowId":4,
       "showIn": ["Default"]
     },
     {
+      "key": "more",
+      "label": "V//V",
+      "icon": "https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png",
+      "href": "#menu-toggle",
+      "position": "top",
+      "rowId": 99,
+      "showIn": ["Default"]
+    },
+    {
+      "key": "projects",
       "label": "Проекты",
       "icon": "https://cdn-icons-png.flaticon.com/512/2721/2721065.png",
       "href": "#",
@@ -26,39 +57,13 @@
       "rowId": 3,
       "showIn": ["V//V Productions", "Projects"],
       "submenu": [
-        {
-          "label": "Project A",
-          "icon": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-          "href": "#"
-        },
-        {
-          "label": "Project B",
-          "icon": "https://cdn-icons-png.flaticon.com/512/3135/3135789.png",
-          "href": "#"
-        }
+        { "label": "Project A", "icon": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", "href": "#" },
+        { "label": "Project B", "icon": "https://cdn-icons-png.flaticon.com/512/3135/3135789.png", "href": "#" }
       ]
-    },
-    {
-      "label": "Аккаунт",
-      "icon": "https://cdn-icons-png.flaticon.com/512/1077/1077063.png",
-      "href": "#",
-      "position": "bottom",
-      "rowId": 1,
-      "mobileRowId":3,
-      "showIn": ["Default"]
-    },
-    {
-      "label": "Блог",
-      "icon": "https://cdn-icons-png.flaticon.com/512/1828/1828940.png",
-      "href": "#",
-      "position": "bottom",
-      "rowId": 2,
-      "mobileRowId":2,
-      "showIn": ["Default"]
     }
   ],
-  
-    "modules": {
+
+  "modules": {
     "socialButtons": true
   }
 }
