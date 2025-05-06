@@ -1,13 +1,9 @@
 /* 
   Name: menu.js
   Author: Vladislav Babarikov
-  Version: 1.2
-  Created: 2025-05-04
-  Description: Логика для динамического бокового меню проекта V//V Productions
+  Version: 1.2.1
+  Description: Логика динамического меню V//V Productions
   License: Все права защищены © Vladislav Babarikov
-  Website: https://vvproductions.ru
-  Contact: info@vvproductions.ru
-  by V//V Productions.
 */
 
 const CONFIG_URL =
@@ -15,18 +11,13 @@ const CONFIG_URL =
 const MENU_HTML_URL =
   'https://raw.githubusercontent.com/vladislavbabarikov/V-V-productions-tilda/refs/heads/main/menu/menu.html';
 
-const companyLogo =
-  'https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png';
-
 const sectionLabels = { t337: 'Professional Page' };
 
 document.addEventListener('DOMContentLoaded', () => {
-  /* вставляем HTML меню */
   fetch(MENU_HTML_URL)
     .then(r => r.text())
     .then(html => {
       document.body.insertAdjacentHTML('beforeend', html);
-      /* загружаем конфиг и запускаем обе инициализации */
       fetch(CONFIG_URL)
         .then(r => r.json())
         .then(cfg => {
@@ -36,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* ───────────  SIDEBAR (десктоп)  ─────────── */
+/* ─────────── SIDEBAR (десктоп) ─────────── */
 function initializeSidebar(config) {
   const labelEl = document.getElementById('sidebar-label');
   const topMenu = document.getElementById('menu-top');
@@ -44,7 +35,6 @@ function initializeSidebar(config) {
   const sidebar = document.getElementById('sidebar');
   const submenuState = { open: false };
 
-  /* вычисляем активный label */
   let activeLabel = 'V//V Production';
   for (const cls in sectionLabels) {
     if (document.querySelector(`.${cls}`)) {
@@ -78,22 +68,22 @@ function initializeSidebar(config) {
     createMenuItem(item).forEach(el => target.appendChild(el));
   });
 
-  /* социальные кнопки (модуль) */
   if (modules.socialButtons) {
     const s = document.createElement('script');
     s.src =
       'https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/menu/modules/social-buttons.js';
     s.onload = () => {
-      typeof applySocialButtons === 'function' &&
+      if (typeof applySocialButtons === 'function') {
         applySocialButtons('#menu-top');
+      }
     };
     document.body.appendChild(s);
   }
 
-  /* auto‑close сабменю при hover‑out */
   sidebar.addEventListener('mouseleave', () => {
     if (submenuState.open) toggleSubmenu(false);
   });
+
   sidebar.addEventListener('mouseenter', () => {
     if (submenuState.open) toggleSubmenu(true);
   });
@@ -134,7 +124,7 @@ function initializeSidebar(config) {
       });
       return [wrap, sub];
     }
-    /* обычный пункт */
+
     const link = document.createElement('a');
     link.href = item.href;
     link.className = 'menu-item';
@@ -145,35 +135,23 @@ function initializeSidebar(config) {
   }
 }
 
-/* ───────────  MOBILE BOTTOM NAV  ─────────── */
+/* ─────────── MOBILE NAV (нижняя панель) ─────────── */
 function initializeMobileNav(config) {
   const mobileNav = document.getElementById('mobile-nav');
   if (!mobileNav) return;
 
-  /* выбираем первые 4 элемента по mobileRowId / rowId */
   const items = (config.menuConfig || [])
     .filter(i => i.showIn.includes('Default'))
-    .sort(
-      (a, b) =>
-        (a.mobileRowId ?? a.rowId) - (b.mobileRowId ?? b.rowId)
-    )
-    .slice(0, 4);
+    .sort((a, b) => (a.mobileRowId ?? a.rowId) - (b.mobileRowId ?? b.rowId))
+    .slice(0, 5); // до 5 элементов
 
-  items.forEach((item, idx) => {
+  items.forEach(item => {
     const btn = document.createElement('a');
     btn.href = item.href;
     btn.className = 'nav-btn';
-    btn.innerHTML = `<img src="${item.icon}" alt="${item.label}">
-                     <span>${item.label}</span>`;
-
-    if (idx < 2) mobileNav.appendChild(btn);
-    if (idx === 1) {
-      const logo = document.createElement('div');
-      logo.className = 'logo-slot';
-      logo.innerHTML = `<img src="${companyLogo}" alt="logo">
-                        <span>V//V</span>`;
-      mobileNav.appendChild(logo);
-    }
-    if (idx >= 2) mobileNav.appendChild(btn);
+    btn.innerHTML = `
+      <img src="${item.icon}" alt="${item.label}">
+      <span>${item.label}</span>`;
+    mobileNav.appendChild(btn);
   });
 }
