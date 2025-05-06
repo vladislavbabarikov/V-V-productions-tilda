@@ -1,11 +1,14 @@
-/* 
+/*
   Name: menu.css
   Author: Vladislav Babarikov
-  Version: 1.2
-  Description: Стили для бокового навигационного меню V//V Productions
+  Version: 1.2.1
+  Description: Стили бокового и нижнего меню V//V Productions
   License: Все права защищены © Vladislav Babarikov
   by V//V Productions
 */
+
+/* ─────────────── DESKTOP SIDEBAR ─────────────── */
+
 .sidebar-menu {
   position: fixed;
   top: 0;
@@ -13,7 +16,7 @@
   height: 100vh;
   width: 60px;
   background-color: #fff;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: width 0.3s ease;
   z-index: 1000;
@@ -22,9 +25,12 @@
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   justify-content: space-between;
+  box-sizing: border-box;
 }
 
-.sidebar-menu:hover { width: 240px; }
+.sidebar-menu:hover {
+  width: 240px;
+}
 
 .sidebar-header {
   display: flex;
@@ -67,7 +73,8 @@
   flex-direction: column;
 }
 
-.menu-item, .submenu-item {
+.menu-item,
+.submenu-item {
   display: flex;
   align-items: center;
   width: 100%;
@@ -78,11 +85,13 @@
   color: inherit;
 }
 
-.menu-item:hover, .submenu-item:hover {
+.menu-item:hover,
+.submenu-item:hover {
   background-color: #f4f4f4;
 }
 
-.menu-item img, .submenu-item img {
+.menu-item img,
+.submenu-item img {
   width: 24px;
   height: 24px;
   flex-shrink: 0;
@@ -134,43 +143,69 @@
   padding-top: 10px;
   margin-top: auto;
 }
-/* ─────────────────────────  MOBILE BOTTOM NAV  ───────────────────────── */
-.mobile-bottom-nav{
-  position:fixed; bottom:0; left:0; width:100%;
-  height:60px; background:#fff;
-  border-top-left-radius:10px; border-top-right-radius:10px;
-  box-shadow:0 -2px 5px rgba(0,0,0,.1);
-  display:none; flex-direction:row; justify-content:space-between;
-  padding:0 12px; z-index:1000; font-family:'Montserrat',sans-serif;
+
+/* ─────────────── MOBILE BOTTOM NAV ─────────────── */
+
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: #fff;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+  font-family: 'Montserrat', sans-serif;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.mobile-bottom-nav .nav-btn{
-  flex:0 0 50px; height:100%; display:flex;
-  flex-direction:column; align-items:center; justify-content:center;
-  text-decoration:none; color:#000; font-size:11px;
+.mobile-bottom-nav .nav-btn {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-decoration: none;
+  color: #000;
+  font-size: 11px;
+  line-height: 1.2;
+  padding: 4px 0;
+  overflow: visible;
+  white-space: nowrap;
 }
 
-.mobile-bottom-nav .nav-btn img{width:24px;height:24px;margin-bottom:2px;}
-
-.mobile-bottom-nav .logo-slot{
-  position:absolute; left:50%; top:-25px; transform:translateX(-50%);
-  width:70px; height:70px; background:#fff; border-radius:50%;
-  box-shadow:0 0 5px rgba(0,0,0,.08); display:flex;
-  flex-direction:column; align-items:center; justify-content:center;
+.mobile-bottom-nav .nav-btn img {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 2px;
 }
 
-.logo-slot img{width:34px;height:34px;}
-.logo-slot span{font-size:9px; margin-top:2px; color:#555;}
+/* ─────────────── MEDIA QUERIES ─────────────── */
 
-@media (max-width:767px){
-  .mobile-bottom-nav{display:flex;}
-  .sidebar-menu{display:none;}
-}
-@media (min-width:768px){
-  .sidebar-menu{
-    display:flex;
-    flex-direction:column;
-    padding:20px 0;
+@media (max-width: 767px) {
+  .mobile-bottom-nav {
+    display: flex;
   }
-  .mobile-bottom-nav{display:none;}
+  .sidebar-menu {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+  }
+  .mobile-bottom-nav {
+    display: none;
+  }
 }
