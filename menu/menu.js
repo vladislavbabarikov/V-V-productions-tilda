@@ -61,7 +61,7 @@ function initializeSidebar(config) {
   if (modules.socialButtons) {
     const s = document.createElement('script');
     s.src =
-      'https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/menu/modules/social-buttons.js';
+      'https://vladislavbabarikov.github.io/V-V-productions-tilda/menu/modules/social-buttons.js';
     s.onload = () =>
       typeof applySocialButtons === 'function' && applySocialButtons('#menu-top');
     document.body.appendChild(s);
