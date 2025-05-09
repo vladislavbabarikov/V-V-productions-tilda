@@ -1,15 +1,319 @@
 <!-- 
   Name: insert-html.txt
   Author: Vladislav Babarikov
-  Version: 1.01
+  Version: 1.4
   Description: Код для вставки внутрь блока T123 V//V Productions
   License: Все права защищены © Vladislav Babarikov
   by V//V Productions
 -->
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+.sidebar-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 60px;
+  background-color: #fff;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  font-family: 'Montserrat', sans-serif;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 0;
+  box-sizing: border-box;
+}
 
-<!-- CSS, JS, HTML it will be inserted automatically inside menu.js -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/menu/menu.css">
-<script src="https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/menu/menu.js"></script>
+.sidebar-menu:hover {
+  width: 240px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  margin-bottom: 20px;
+}
+
+.sidebar-logo img {
+  width: 30px;
+  height: auto;
+}
+
+.sidebar-label {
+  font-size: 14px;
+  color: #888;
+  margin-left: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.sidebar-menu:hover .sidebar-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sidebar-menu a.menu-item,
+.sidebar-menu a.submenu-item {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar-menu a.menu-item:hover,
+.sidebar-menu a.submenu-item:hover {
+  background-color: #f4f4f4;
+}
+
+.menu-item img,
+.submenu-item img {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.sidebar-menu a.menu-item svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  object-fit: contain;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.menu-text {
+  margin-left: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.sidebar-menu:hover .menu-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.menu-item.has-submenu {
+  justify-content: space-between;
+}
+
+.toggle-arrow {
+  margin-left: auto;
+  transition: transform 0.2s;
+}
+
+.toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+.submenu.open {
+  max-height: 500px;
+  opacity: 1;
+  pointer-events: all;
+}
+
+.menu-bottom {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  margin-top: auto;
+}
+</style>
+
+<div class="sidebar-menu" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <img src="https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png" alt="Logo">
+    </div>
+    <div class="sidebar-label" id="sidebar-label">V//V Productions</div>
+  </div>
+  <div class="menu-section" id="menu-top"></div>
+  <div class="menu-section menu-bottom" id="menu-bottom"></div>
+</div>
+
+<script>
+const CONFIG_URL = 'https://vladislavbabarikov.github.io/V-V-productions-tilda/menu/menu-config.json';
+
+document.addEventListener('DOMContentLoaded', () => {
+  let lastOpenedKey = null;
+  const sidebar = document.getElementById('sidebar');
+
+  let pageID = null;
+  const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_COMMENT, null, false);
+  let c;
+  while (c = walker.nextNode()) {
+    const m = c.nodeValue.match(/ID:\s*(.+)/);
+    if (m) { pageID = m[1].trim(); break; }
+  }
+  const labelEl = document.getElementById('sidebar-label');
+  if (labelEl) labelEl.innerText = pageID || 'V//V Productions';
+
+  fetch(CONFIG_URL)
+    .then(r => r.json())
+    .then(cfg => {
+      initializeSidebar(cfg, pageID);
+      if (cfg.modules && cfg.modules.socialButtons) {
+        (function(topMenuSelector = '#menu-top') {
+          let applied = false;
+          function applySocialButtons(t188) {
+            if (applied) return;
+            applied = true;
+            const topMenu = document.querySelector(topMenuSelector);
+            t188.querySelectorAll('.t-sociallinks__wrapper a').forEach(link => {
+              const label = link.getAttribute('aria-label') || 'Соц.сеть';
+              const href  = link.href || '#';
+              let iconHTML = '';
+              const img = link.querySelector('img');
+              const svg = link.querySelector('svg');
+              if (img) {
+                iconHTML = '<img src="' + img.src + '" alt="' + label +
+                  '" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;">';
+              } else if (svg) {
+                const clone = svg.cloneNode(true);
+                clone.setAttribute('width','24');
+                clone.setAttribute('height','24');
+                clone.style.verticalAlign = 'middle';
+                iconHTML = clone.outerHTML;
+              }
+              const btn = document.createElement('a');
+              btn.href = href;
+              btn.className = 'menu-item';
+              btn.innerHTML = iconHTML + '<div class="menu-text">' + label + '</div>';
+              topMenu.appendChild(btn);
+            });
+          }
+          const obs = new MutationObserver((_, o) => {
+            const t188 = document.querySelector('.t188');
+            if (t188) { o.disconnect(); applySocialButtons(t188); }
+          });
+          obs.observe(document.body, { childList: true, subtree: true });
+          const initial = document.querySelector('.t188');
+          if (initial) applySocialButtons(initial);
+        })();
+      }
+    })
+    .catch(err => console.error('Не удалось загрузить конфиг меню:', err));
+
+  function initializeSidebar(config, pageID) {
+    const topSection = document.getElementById('menu-top');
+    const botSection = document.getElementById('menu-bottom');
+    if (!topSection || !botSection) return;
+
+    const items = Array.isArray(config.menuConfig) ? config.menuConfig : [];
+
+    const topItems = items.filter(i =>
+      i.position === 'top' &&
+      Array.isArray(i.showIn) &&
+      (i.showIn.includes('Default') || i.showIn.includes(pageID))
+    );
+    const botItems = items.filter(i =>
+      i.position === 'bottom' &&
+      Array.isArray(i.showIn) &&
+      (i.showIn.includes('Default') || i.showIn.includes(pageID))
+    );
+
+    function makeItem(item) {
+      const a = document.createElement('a');
+      a.href = item.href === '#' ? 'javascript:void(0)' : item.href;
+      a.className = 'menu-item';
+      a.innerHTML =
+        '<img src="' + item.icon + '" alt="' + item.label + '">' +
+        '<div class="menu-text">' + item.label + '</div>';
+      return a;
+    }
+
+    function makeWithSubmenu(item) {
+      const parent = document.createElement('a');
+      parent.href = 'javascript:void(0)';
+      parent.className = 'menu-item has-submenu';
+      parent.dataset.key = item.key;
+      parent.innerHTML =
+        '<img src="' + item.icon + '" alt="' + item.label + '">' +
+        '<div class="menu-text">' + item.label + '</div>';
+
+      const arrow = document.createElement('span');
+      arrow.className = 'toggle-arrow';
+      arrow.innerHTML = '&#9662;';
+      parent.appendChild(arrow);
+
+      const sub = document.createElement('div');
+      sub.className = 'submenu';
+      item.submenu.forEach(si => {
+        const sa = document.createElement('a');
+        sa.href = si.href === '#' ? 'javascript:void(0)' : si.href;
+        sa.className = 'submenu-item';
+        sa.innerHTML =
+          '<img src="' + si.icon + '" alt="' + si.label + '">' +
+          '<div class="menu-text">' + si.label + '</div>';
+        sub.appendChild(sa);
+      });
+
+      parent.addEventListener('click', e => {
+        e.preventDefault();
+        const isOpen = sub.classList.toggle('open');
+        arrow.classList.toggle('open', isOpen);
+        lastOpenedKey = isOpen ? parent.dataset.key : null;
+      });
+
+      return { parent, submenu: sub };
+    }
+
+    topSection.innerHTML = '';
+    topItems.forEach(i => {
+      if (i.submenu) {
+        const { parent, submenu } = makeWithSubmenu(i);
+        topSection.appendChild(parent);
+        topSection.appendChild(submenu);
+      } else {
+        topSection.appendChild(makeItem(i));
+      }
+    });
+
+    botSection.innerHTML = '';
+    botItems.forEach(i => {
+      if (i.submenu) {
+        const { parent, submenu } = makeWithSubmenu(i);
+        botSection.appendChild(parent);
+        botSection.appendChild(submenu);
+      } else {
+        botSection.appendChild(makeItem(i));
+      }
+    });
+
+    sidebar.addEventListener('mouseleave', () => {
+      sidebar.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
+      sidebar.querySelectorAll('.toggle-arrow.open').forEach(a => a.classList.remove('open'));
+    });
+    sidebar.addEventListener('mouseenter', () => {
+      if (!lastOpenedKey) return;
+      const parent = sidebar.querySelector('.menu-item.has-submenu[data-key="' + lastOpenedKey + '"]');
+      if (!parent) return;
+      const arrow = parent.querySelector('.toggle-arrow');
+      const sub = parent.nextElementSibling;
+      sub.classList.add('open');
+      arrow.classList.add('open');
+    });
+  }
+});
+</script>
