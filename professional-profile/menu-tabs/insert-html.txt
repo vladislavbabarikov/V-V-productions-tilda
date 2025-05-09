@@ -1,0 +1,202 @@
+<!-- 
+  Name: insert-html.txt
+  Author: Vladislav Babarikov
+  Version: 1.0
+  Description: Код для вставки внутрь блока T123 V//V Productions (tabs menu + seed generator)
+  License: Все права защищены © Vladislav Babarikov
+  by V//V Productions
+-->
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+
+<style>
+:root{ --gap:16px; }
+
+.tabs{
+  display:flex;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  margin-left: 15px;
+  justify-content:flex-start;
+  gap:10px;
+  position:sticky;top:0;z-index:90;
+  background:#fff;padding:10px 0;
+  border-bottom:1px solid #eee;
+}
+@media(min-width:768px){
+  .tabs{ justify-content:center; overflow-x:visible; }
+}
+
+.tabs::-webkit-scrollbar{display:none;}
+
+.tab{
+  flex:0 0 auto;
+  padding:10px 20px;
+  border-radius:25px;border:none;cursor:pointer;
+  background:#fff;font-weight:500;font-size:16px;
+  transition:.3s;
+}
+.tab.active{background:#000;color:#fff;}
+
+.portfolio-gallery-wrapper{overflow:hidden;min-height:100vh;}
+@supports(min-height:100dvh){.portfolio-gallery-wrapper{min-height:100dvh;}}
+
+.portfolio-gallery{
+  display:grid;grid-auto-flow:dense;
+  gap:var(--gap);padding:0 var(--gap);
+  opacity:0;transition:opacity .4s ease;
+}
+.portfolio-gallery.show{opacity:1;}
+
+.portfolio-gallery{grid-template-columns:repeat(2,1fr);}
+@media(min-width:768px){  .portfolio-gallery{grid-template-columns:repeat(3,1fr);} }
+@media(min-width:1280px){ .portfolio-gallery{grid-template-columns:repeat(6,1fr);} }
+
+.grid-item{
+  position:relative;
+  aspect-ratio:1/1;
+  animation:fadeItem .4s ease forwards;
+}
+.grid-item a,.grid-item img{position:absolute;inset:0;width:100%;height:100%;border-radius:8px;}
+.grid-item img{object-fit:cover;transition:transform .3s;}
+.grid-item:hover img{transform:scale(1.05);}
+
+.grid-item.hor   {grid-column:span 2;aspect-ratio:2/1;}
+.grid-item.hor23 {grid-column:span 3;grid-row:span 2;aspect-ratio:3/2;}
+.grid-item.hor63 {grid-column:1 / -1;grid-row:span 3;aspect-ratio:6/3;}
+
+.grid-item.ver   {grid-row:span 2;aspect-ratio:1/2;}
+.grid-item.ver32 {grid-column:3 / span 2;grid-row:span 3;aspect-ratio:2/3;}
+
+.grid-item.sq2      {grid-column:span 2;grid-row:span 2;}
+.grid-item.sqCenter {grid-column:3 / span 2;grid-row:span 2;}
+
+@keyframes fadeItem{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
+</style>
+
+<div class="portfolio-tabs">
+  <div id="up"></div>
+  <div class="tabs" id="tabs"></div>
+
+  <div class="portfolio-gallery-wrapper">
+    <div class="portfolio-gallery" id="gallery"></div>
+  </div>
+</div>
+
+<script>
+const JSON_URL="https://cdn.jsdelivr.net/gh/vladislavbabarikov/V-V-productions-tilda@main/professional-profile/menu-tabs/gallery-config.json";
+
+const tabsBox=document.getElementById('tabs');
+const gallery=document.getElementById('gallery');
+let DATA=[];
+
+let SEED=0;
+
+const COLS = () => innerWidth>=1280?6 : innerWidth>=768?3 : 2;
+const shuffle = arr => arr.sort(()=>Math.random()-0.5);
+
+
+function decideClass(ratio, idx, total){
+  const k = idx + SEED;
+
+  if(total===1){
+    if(ratio>1.3)  return 'hor63';
+    if(ratio<0.8)  return 'ver32';
+    return 'sqCenter';
+  }
+  if(total===2 && ratio>1.3) return 'hor23';
+
+  if(ratio>1.45) return 'hor23';
+  if(ratio>1.15) return 'hor';
+  if(ratio<0.55) return 'ver32';
+  if(ratio<0.8)  return 'ver';
+
+  const c=COLS();
+  if((c===6 && k%7===0) || (c===3 && k%5===0)) return 'sq2';
+  return '';
+}
+
+const fadeOut = cb => { gallery.classList.remove('show'); setTimeout(cb,400); };
+const fadeIn  = () =>  gallery.classList.add('show');
+
+function renderTabs(){
+  tabsBox.innerHTML='';
+  DATA.forEach((t,i)=>{
+    const btn=document.createElement('button');
+    btn.className='tab'+(i===0?' active':'');
+    btn.dataset.tab=t.key;
+    btn.textContent=t.title;
+    tabsBox.appendChild(btn);
+  });
+}
+
+function renderGallery(key, first=false){
+  const tab = DATA.find(t=>t.key===key); if(!tab) return;
+
+  SEED = Math.floor(Math.random()*10);
+
+  const pics = shuffle([...tab.images]);
+
+  const build=()=>{
+    gallery.innerHTML='';
+    pics.forEach((url,i)=>{
+      const div=document.createElement('div');
+      div.className='grid-item';
+        div.innerHTML = `
+          <a href="${url}" data-fancybox="${key}">
+            <img src="${url}" loading="lazy">
+          </a>`;
+
+      gallery.appendChild(div);
+
+      div.querySelector('img').addEventListener('load',e=>{
+        const cls = decideClass(e.target.naturalWidth/e.target.naturalHeight,i,pics.length);
+        if(cls) div.classList.add(cls);
+      });
+    });
+    Fancybox.bind('[data-fancybox]',{});
+    fadeIn();
+  };
+
+  first ? build() : fadeOut(build);
+}
+
+let rTO=null;
+addEventListener('resize',()=>{
+  clearTimeout(rTO);
+  rTO=setTimeout(()=>{
+    const items=[...gallery.querySelectorAll('.grid-item')];
+    const total=items.length;
+    items.forEach((it,i)=>{
+      it.className='grid-item';
+      const img=it.querySelector('img');
+      if(img.complete){
+        const cls=decideClass(img.naturalWidth/img.naturalHeight,i,total);
+        if(cls) it.classList.add(cls);
+      }
+    });
+  },250);
+});
+
+tabsBox.addEventListener('click',e=>{
+  if(!e.target.classList.contains('tab')) return;
+  tabsBox.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderGallery(e.target.dataset.tab);
+  if(Math.abs(tabsBox.getBoundingClientRect().top)<1){
+    scrollTo({top:document.getElementById('up').getBoundingClientRect().top+scrollY,behavior:'smooth'});
+  }
+});
+
+fetch(JSON_URL)
+  .then(r=>r.json())
+  .then(json=>{
+    DATA=json;
+    renderTabs();
+    renderGallery(json[0].key,true);
+  })
+  .catch(()=>tabsBox.textContent='Ошибка загрузки данных');
+</script>
