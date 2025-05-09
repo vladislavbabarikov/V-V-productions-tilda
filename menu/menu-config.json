@@ -17,9 +17,9 @@
       "label": "V//V",
       "icon": "https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png",
       "href": "#moremobile",
-      "position": "",
-      "rowId": ,
-      "showIn": [""]
+      "position": "bottom",
+      "rowId": 3,
+      "showIn": ["Professional Page"]
     },
     {
       "key": "blog",
