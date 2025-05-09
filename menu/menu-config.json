@@ -13,6 +13,15 @@
       "showIn": ["Default"]
     },
     {
+      "key": "more",
+      "label": "V//V",
+      "icon": "https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png",
+      "href": "#moremobile",
+      "position": "",
+      "rowId": 1,
+      "showIn": [""]
+    },
+    {
       "key": "blog",
       "label": "Блог",
       "icon": "https://cdn-icons-png.flaticon.com/512/1828/1828940.png",
