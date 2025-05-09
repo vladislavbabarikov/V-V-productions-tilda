@@ -7,8 +7,7 @@
     "premium": {
       "icon": "https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
       "tooltip": "Премиум статус"
-    }
-  },
+    },
     "company": {
       "icon": "https://static.tildacdn.com/tild6437-6262-4666-b039-613465303138/image.png",
       "tooltip": "Профиль компании"
