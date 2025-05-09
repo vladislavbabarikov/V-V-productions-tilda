@@ -1,5 +1,5 @@
 {
-  "mobileButtonsKey": ["home", "blog","more", "account", "search"], 
+  "mobileButtonsKey": ["home", "blog","vvprod", "account", "search"], 
   "visibleText": false,
 
   "menuConfig": [
@@ -13,11 +13,11 @@
       "showIn": ["Default"]
     },
     {
-      "key": "more",
+      "key": "vvprod",
       "label": "V//V",
-      "icon": "https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png",
+      "icon": "https://static.tildacdn.com/tild6633-3431-4734-a465-656535323831/image.png",
       "href": "#moremobile",
-      "position": "bottom",
+      "position": "",
       "rowId": 3,
       "showIn": [""]
     },
