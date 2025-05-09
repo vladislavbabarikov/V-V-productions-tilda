@@ -1,144 +1,198 @@
 /* 
   Name: menu.js
   Author: Vladislav Babarikov
-  Version: 1.2.5
+  Version: 1.5
   Description: Логика динамического меню V//V Productions
 */
-
-const CONFIG_URL =
-  'https://vladislavbabarikov.github.io/V-V-productions-tilda/menu/menu-config.json';
-const MENU_HTML_URL =
-  'https://vladislavbabarikov.github.io/V-V-productions-tilda/menu/menu.html';
-
-const sectionLabels = { t337: 'Professional Page' };
+<script>
+const CONFIG_URL = 'https://vladislavbabarikov.github.io/V-V-productions-tilda/menu/menu-config.json';
 
 document.addEventListener('DOMContentLoaded', () => {
-  fetch(MENU_HTML_URL)
-    .then(r => r.text())
-    .then(html => {
-      document.body.insertAdjacentHTML('beforeend', html);
-      return fetch(CONFIG_URL);
-    })
+  let lastOpenedKey = null;
+  let pageIDRaw = null;
+  let pageID    = null;
+
+  // read <!-- ID: ... --> comment
+  const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_COMMENT, null, false);
+  let node;
+  while (node = walker.nextNode()) {
+    const m = node.nodeValue.match(/ID:\s*(.+)/);
+    if (m) {
+      pageIDRaw = m[1].trim();
+      pageID    = pageIDRaw.toLowerCase();
+      break;
+    }
+  }
+
+  const labelEl = document.getElementById('sidebar-label');
+  if (labelEl) labelEl.innerText = pageIDRaw || 'V//V Productions';
+
+  fetch(CONFIG_URL)
     .then(r => r.json())
     .then(cfg => {
-      initializeSidebar(cfg);
-      initializeMobile(cfg);
-    });
+      initializeSidebar(cfg, pageID);
+      if (cfg.modules?.socialButtons) integrateSocial(cfg);
+      initializeMobileMenu(cfg, pageID);
+    })
+    .catch(err => console.error('Не удалось загрузить конфиг меню:', err));
 });
 
-function initializeSidebar(config) {
-  // ... без изменений, как в v1.2.5 выше ...
-}
+function initializeSidebar(config, pageID) {
+  const top = document.getElementById('menu-top');
+  const bot = document.getElementById('menu-bottom');
+  if (!top || !bot) return;
+  const items = Array.isArray(config.menuConfig) ? config.menuConfig : [];
 
-function initializeMobile(cfg) {
-  const mobileNav = document.getElementById('mobile-nav');
-  const mainRow   = document.getElementById('mobile-main-row');
-  const drawer    = document.getElementById('mobile-drawer');
-  if (!mobileNav || !mainRow || !drawer) return;
+  const topItems = items.filter(i =>
+    i.position==='top' &&
+    Array.isArray(i.showIn) &&
+    (i.showIn.map(x=>x.toLowerCase()).includes('default') ||
+     i.showIn.map(x=>x.toLowerCase()).includes(pageID))
+  );
+  const botItems = items.filter(i =>
+    i.position==='bottom' &&
+    Array.isArray(i.showIn) &&
+    (i.showIn.map(x=>x.toLowerCase()).includes('default') ||
+     i.showIn.map(x=>x.toLowerCase()).includes(pageID))
+  );
 
-  const { menuConfig = [], mobileButtonsKey = [], visibleText = true } = cfg;
-  const dict = Object.fromEntries(menuConfig.map(i => [i.key, i]));
-
-  // вспомогательные функции
-  function makeBtn(item, hideLabel) {
+  function makeItem(item) {
     const a = document.createElement('a');
-    a.href = item.href === '#' ? 'javascript:void(0)' : item.href;
-    a.className = 'nav-btn' + (hideLabel ? ' hide-label' : '');
-    a.innerHTML = `<img src="${item.icon}" alt="${item.label}">
-                   <span>${item.label}</span>`;
+    a.href = item.href==='#' ? 'javascript:void(0)' : item.href;
+    a.className = 'menu-item';
+    a.innerHTML =
+      `<img src="${item.icon}" alt="${item.label}">` +
+      `<div class="menu-text">${item.label}</div>`;
     return a;
   }
-  function collapseMenu() {
-    mobileNav.classList.remove('expanded');
-    drawer.style.maxHeight = '0';
-  }
-  function adjustDrawerHeight() {
-    const count = drawer.children.length;
-    if (!count) return;
-    const rows = Math.ceil(count / 5);
-    drawer.style.maxHeight = `${rows * 70}px`;
-  }
 
-  // 1) построить основную строку
-  const mainKeys = mobileButtonsKey.slice(0, 5);
-  mainRow.innerHTML = '';
-  mainKeys.forEach(key => {
-    const itm = dict[key];
-    if (!itm) return;
-    const btn = makeBtn(itm, !visibleText);
-    mainRow.appendChild(btn);
-    // toggle-разворачивалка
-    if (itm.href === '#menu-toggle') {
-      btn.addEventListener('click', e => {
-        e.preventDefault();
-        if (mobileNav.classList.toggle('expanded')) {
-          adjustDrawerHeight();
-        } else {
-          collapseMenu();
-        }
-      });
-    }
-    // сабменю
-    if (itm.submenu) {
-      btn.addEventListener('click', e => {
-        e.preventDefault();
-        openSubmenu(itm);
-      });
-    }
-  });
-
-  // 2) заполнить drawer “остатками” (пока пусто)
-  drawer.innerHTML = '';
-  menuConfig.forEach(itm => {
-    if (mainKeys.includes(itm.key)) return;
-    drawer.appendChild(makeBtn(itm, false));
-  });
-
-  // 3) при клике вне или скролле — скрыть
-  window.addEventListener('click', e => {
-    if (mobileNav.classList.contains('expanded') && !mobileNav.contains(e.target)) {
-      collapseMenu();
-    }
-  });
-  window.addEventListener('scroll', () => {
-    if (mobileNav.classList.contains('expanded')) collapseMenu();
-  });
-
-  // 4) открываем сабменю “вправо”
-  function openSubmenu(item) {
-    const sub = item.submenu || [];
-    // 4.1 собрать новую main-строку: до idx включительно + sub-элементы пока слоты
-    const idx = mainKeys.indexOf(item.key);
-    const newMain = [];
-    // исходные до idx
-    for (let i = 0; i <= idx; i++) newMain.push(dict[mainKeys[i]]);
-    // вставить sub
-    let used = 0;
-    while (newMain.length < 5 && used < sub.length) {
-      newMain.push(sub[used++]);
-    }
-    // если не заполнили все 5, добавить пустышки
-    while (newMain.length < 5) newMain.push(null);
-    // отрендерить
-    mainRow.innerHTML = '';
-    newMain.forEach(itm => {
-      if (itm) mainRow.appendChild(makeBtn(itm, false));
-      else {
-        const ph = document.createElement('div');
-        ph.className = 'nav-btn placeholder';
-        mainRow.appendChild(ph);
-      }
+  function makeWithSubmenu(item) {
+    const p = document.createElement('a');
+    p.href = 'javascript:void(0)';
+    p.className = 'menu-item has-submenu';
+    p.dataset.key = item.key;
+    p.innerHTML =
+      `<img src="${item.icon}" alt="${item.label}">` +
+      `<div class="menu-text">${item.label}</div>`;
+    const arrow = document.createElement('span');
+    arrow.className = 'toggle-arrow';
+    arrow.innerHTML = '&#9662;';
+    p.appendChild(arrow);
+    const sub = document.createElement('div');
+    sub.className = 'submenu';
+    item.submenu.forEach(si=>{
+      const sa = document.createElement('a');
+      sa.href = si.href==='#'? 'javascript:void(0)' : si.href;
+      sa.className = 'submenu-item';
+      sa.innerHTML =
+        `<img src="${si.icon}" alt="${si.label}">` +
+        `<div class="menu-text">${si.label}</div>`;
+      sub.appendChild(sa);
     });
-
-    // 4.2 в drawer — оставшиеся sub (если есть)
-    const rem = sub.slice(used);
-    drawer.innerHTML = '';
-    rem.forEach(itm => drawer.appendChild(makeBtn(itm, false)));
-    if (rem.length) {
-      mobileNav.classList.add('expanded');
-      adjustDrawerHeight();
-    } else {
-      collapseMenu();
-    }
+    p.addEventListener('click', e=>{
+      e.preventDefault();
+      const open = sub.classList.toggle('open');
+      arrow.classList.toggle('open', open);
+      lastOpenedKey = open ? p.dataset.key : null;
+    });
+    return { parent: p, submenu: sub };
   }
+
+  top.innerHTML = '';
+  topItems.forEach(i=>{
+    if (i.submenu) {
+      const { parent, submenu } = makeWithSubmenu(i);
+      top.appendChild(parent);
+      top.appendChild(submenu);
+    } else top.appendChild(makeItem(i));
+  });
+
+  bot.innerHTML = '';
+  botItems.forEach(i=>{
+    if (i.submenu) {
+      const { parent, submenu } = makeWithSubmenu(i);
+      bot.appendChild(parent);
+      bot.appendChild(submenu);
+    } else bot.appendChild(makeItem(i));
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  sidebar.addEventListener('mouseleave', ()=>{
+    sidebar.querySelectorAll('.submenu.open').forEach(s=>s.classList.remove('open'));
+    sidebar.querySelectorAll('.toggle-arrow.open').forEach(a=>a.classList.remove('open'));
+  });
+  sidebar.addEventListener('mouseenter', ()=>{
+    if (!lastOpenedKey) return;
+    const p = sidebar.querySelector(`.menu-item.has-submenu[data-key="${lastOpenedKey}"]`);
+    if (!p) return;
+    const arrow = p.querySelector('.toggle-arrow');
+    const sub   = p.nextElementSibling;
+    sub.classList.add('open');
+    arrow.classList.add('open');
+  });
 }
+
+function initializeMobileMenu(config, pageID) {
+  const mobileMain  = document.getElementById('mobile-main');
+  const mobileTitle = document.getElementById('mobile-title');
+
+  mobileMain.innerHTML = '';
+  config.mobileButtonsKey.forEach(key=>{
+    const it = (config.menuConfig||[]).find(i=>i.key===key);
+    const a  = document.createElement('a');
+    a.href = it?.href || 'javascript:void(0)';
+    if (it) {
+      const img = document.createElement('img');
+      img.src = it.icon; img.alt = it.label;
+      a.appendChild(img);
+      if (config.visibleText) {
+        const span = document.createElement('span');
+        span.innerText = it.label;
+        a.appendChild(span);
+      }
+    }
+    mobileMain.appendChild(a);
+  });
+
+  mobileTitle.innerText = pageID;
+}
+
+function integrateSocial(config) {
+  (function(topMenuSelector = '#menu-top') {
+    let applied = false;
+    function applySocialButtons(t188) {
+      if (applied) return;
+      applied = true;
+      const topMenu = document.querySelector(topMenuSelector);
+      t188.querySelectorAll('.t-sociallinks__wrapper a').forEach(link=>{
+        const label = link.getAttribute('aria-label') || 'Соц.сеть';
+        const href  = link.getAttribute('href') || '#';
+        let iconHTML = '';
+        const img = link.querySelector('img');
+        const svg = link.querySelector('svg');
+        if (img) {
+          iconHTML = `<img src="${img.src}" alt="${label}" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;">`;
+        } else if (svg) {
+          const clone = svg.cloneNode(true);
+          clone.setAttribute('width','24');
+          clone.setAttribute('height','24');
+          clone.style.verticalAlign = 'middle';
+          iconHTML = clone.outerHTML;
+        }
+        const btn = document.createElement('a');
+        btn.href = href;
+        btn.className = 'menu-item';
+        btn.innerHTML = iconHTML + `<div class="menu-text">${label}</div>`;
+        topMenu.appendChild(btn);
+      });
+    }
+    const obs = new MutationObserver((_, o)=>{
+      const t188 = document.querySelector('.t188');
+      if (t188) { o.disconnect(); applySocialButtons(t188); }
+    });
+    obs.observe(document.body,{ childList:true, subtree:true });
+    const initial = document.querySelector('.t188');
+    if (initial) applySocialButtons(initial);
+  })();
+}
+</script>
