@@ -1,254 +1,151 @@
 /*
   Name: menu.css
   Author: Vladislav Babarikov
-  Version: 1.2.5
+  Version: 1.5
   Description: Стили бокового и нижнего меню V//V Productions
   License: Все права защищены © Vladislav Babarikov
   by V//V Productions
 */
 
-/* ─────────────── DESKTOP SIDEBAR ─────────────── */
-
+<style>
 .sidebar-menu {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 60px;
-  background-color: #fff;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  top: 0; left: 0;
+  height: 100vh; width: 60px;
+  background: #fff;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
   overflow: hidden;
   transition: width 0.3s ease;
   z-index: 1000;
-  display: none;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
   font-family: 'Montserrat', sans-serif;
   border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  justify-content: space-between;
+  border-bottom-right-radius: 0;
   box-sizing: border-box;
 }
-
-.sidebar-menu:hover {
-  width: 240px;
-}
+.sidebar-menu:hover { width: 240px; }
 
 .sidebar-header {
   display: flex;
   align-items: center;
   padding: 0 20px;
-  width: 100%;
   margin-bottom: 20px;
-  box-sizing: border-box;
 }
-
 .sidebar-logo img {
-  width: 30px;
-  height: auto;
-  flex-shrink: 0;
+  width: 30px; height: auto;
 }
-
 .sidebar-label {
-  font-size: 14px;
-  color: #888;
+  font-size: 14px; color: #888;
   margin-left: 12px;
   white-space: nowrap;
   opacity: 0;
   transform: translateX(-10px);
   transition: opacity 0.3s, transform 0.3s;
 }
-
 .sidebar-menu:hover .sidebar-label {
-  opacity: 1;
-  transform: translateX(0);
+  opacity: 1; transform: translateX(0);
 }
 
-.sidebar-menu a {
-  text-decoration: none;
-  color: black;
-}
-
-.menu-section {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.menu-item,
-.submenu-item {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 12px 20px;
-  cursor: pointer;
+.sidebar-menu a.menu-item,
+.sidebar-menu a.submenu-item {
+  text-decoration: none; color: inherit;
+  display: flex; align-items: center;
+  padding: 12px 20px; cursor: pointer;
   transition: background 0.2s;
-  box-sizing: border-box;
-  color: inherit;
 }
-
-.menu-item:hover,
-.submenu-item:hover {
+.sidebar-menu a.menu-item:hover,
+.sidebar-menu a.submenu-item:hover {
   background-color: #f4f4f4;
 }
 
 .menu-item img,
 .submenu-item img {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
+  width: 24px; height: 24px; flex-shrink: 0;
+}
+.sidebar-menu a.menu-item svg {
+  width: 24px; height: 24px;
+  flex-shrink: 0; object-fit: contain;
+  vertical-align: middle; display: inline-block;
 }
 
 .menu-text {
-  margin-left: 12px;
-  white-space: nowrap;
-  word-break: break-word;
-  opacity: 0;
-  transform: translateX(-10px);
+  margin-left: 12px; white-space: nowrap;
+  opacity: 0; transform: translateX(-10px);
   transition: opacity 0.2s, transform 0.2s;
 }
-
 .sidebar-menu:hover .menu-text {
-  opacity: 1;
-  transform: translateX(0);
+  opacity: 1; transform: translateX(0);
 }
+
+.menu-item.has-submenu { justify-content: space-between; }
+.toggle-arrow { margin-left: auto; transition: transform 0.2s; }
+.toggle-arrow.open { transform: rotate(180deg); }
 
 .submenu {
-  display: flex;
-  flex-direction: column;
-  margin-left: 20px;
-  border-left: 2px solid #eee;
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
+  display: flex; flex-direction: column;
+  margin-left: 20px; overflow: hidden;
+  max-height: 0; opacity: 0; pointer-events: none;
   transition: max-height 0.4s ease, opacity 0.3s ease;
 }
-
 .submenu.open {
-  max-height: 500px;
-  opacity: 1;
-  pointer-events: all;
-}
-
-.toggle-arrow {
-  margin-left: auto;
-  transition: transform 0.2s;
-}
-
-.toggle-arrow.open {
-  transform: rotate(180deg);
+  max-height: 500px; opacity: 1; pointer-events: all;
 }
 
 .menu-bottom {
   border-top: 1px solid #eee;
-  padding-top: 10px;
-  margin-top: auto;
+  padding-top: 10px; margin-top: auto;
 }
-
-/* ─────────────── MOBILE BOTTOM NAV ─────────────── */
-
-.mobile-bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  border-top-left-radius: 14px;
-  border-top-right-radius: 14px;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-  display: flex;               /* теперь flex вместо block */
-  flex-direction: column;
-  z-index: 1000;
-  font-family: 'Montserrat', sans-serif;
-  padding: 0;
-  box-sizing: border-box;
-  overflow: hidden;
-  transition: height 0.3s ease;
-}
-
-.nav-main {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 70px;
-  width: 100%;
-  background: #fff;
-  border-top-left-radius: 14px;
-  border-top-right-radius: 14px;
-}
-
-.nav-btn {
-  flex: 1 0 20%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: #000;
-  font-size: 11px;
-  padding: 4px 0;
-  white-space: nowrap;
-  height: 100%;
-}
-
-.nav-btn img {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 2px;
-}
-
-.nav-btn.hide-label span {
-  display: none;
-}
-
-.nav-drawer {
-  width: 100%;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-  background: #fff;
-  border-top: 1px solid #eee;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start; /* теперь влево */
-  gap: 10px;
-  padding: 0;
-  scrollbar-width: none;
-}
-
-.nav-drawer::-webkit-scrollbar {
-  display: none;
-}
-
-.mobile-bottom-nav.expanded .nav-drawer {
-  /* высота рассчитывается скриптом */
-  overflow-y: auto;
-  padding: 10px;
-}
-
-.nav-btn.placeholder {
-  visibility: hidden;
-  flex: 1 0 20%;
-}
-
-
-/* ─────────────── MEDIA QUERIES ─────────────── */
 
 @media (max-width: 767px) {
-  .mobile-bottom-nav {
-    display: flex;  /* flex, не block */
+  .sidebar-menu { display: none; }
+
+  #mobile-menu {
+    display: flex; flex-direction: column;
+    position: fixed; bottom: 0; left: 0;
+    width: 100%; height: 60px;
+    background: #fff;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+    font-family: 'Montserrat', sans-serif;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    overflow: hidden;
   }
-  .sidebar-menu {
-    display: none;
+
+  .mobile-main {
+    height: 30px; margin-top: 5px;
+    display: flex; justify-content: space-around;
+    align-items: center;
+  }
+  .mobile-main a {
+    flex: 1; display: flex;
+    align-items: center; justify-content: center;
+    text-decoration: none; color: inherit;
+  }
+  .mobile-main a img,
+  .mobile-main a svg {
+    width: 24px; height: 24px;
+    object-fit: contain;
+  }
+  .mobile-main a span {
+    font-size: 10px; margin-top: 2px;
+    white-space: nowrap;
+  }
+
+  .mobile-title {
+    height: 20px; margin-bottom: 5px;
+    text-align: center;
+    font-size: 12px;
+    text-transform: lowercase;
+    color: #888;
+    line-height: 20px;
   }
 }
 
 @media (min-width: 768px) {
-  .sidebar-menu {
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0;
-  }
-  .mobile-bottom-nav {
-    display: none;
-  }
+  .sidebar-menu { display: flex; }
+  #mobile-menu    { display: none; }
 }
+</style>
