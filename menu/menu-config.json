@@ -40,22 +40,13 @@
       "showIn": ["Default"]
     },
     {
-      "key": "more",
-      "label": "V//V",
-      "icon": "https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png",
-      "href": "#menu-toggle",
-      "position": "top",
-      "rowId": 99,
-      "showIn": ["Default"]
-    },
-    {
       "key": "projects",
       "label": "Проекты",
       "icon": "https://cdn-icons-png.flaticon.com/512/2721/2721065.png",
       "href": "#",
       "position": "top",
       "rowId": 3,
-      "showIn": ["V//V Productions", "Projects"],
+      "showIn": ["V//V Productions"],
       "submenu": [
         { "label": "Project A", "icon": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", "href": "#" },
         { "label": "Project B", "icon": "https://cdn-icons-png.flaticon.com/512/3135/3135789.png", "href": "#" }
