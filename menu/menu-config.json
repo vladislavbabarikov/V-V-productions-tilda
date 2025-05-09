@@ -17,8 +17,8 @@
       "label": "V//V",
       "icon": "https://static.tildacdn.com/tild3263-3962-4565-a631-396330636565/image.png",
       "href": "#moremobile",
-      "position": "",
-      "rowId": 1,
+      "position": "top",
+      "rowId": 4,
       "showIn": ["Default"]
     },
     {
